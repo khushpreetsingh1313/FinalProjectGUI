@@ -1,112 +1,119 @@
-# Python Tkinter and Sqlite3 Login Form
-# Made By Namah Jain Form Youtube Channel All About Code
-# Please Subscribe To Our Youtube Channel.
-# https://www.youtube.com/channel/UCUGAq4ALoWW4PDU6Cm1riSg?view_as=subscriber
-
-# imports
-from tkinter import *
-from tkinter import messagebox as ms
 import sqlite3
-
-# make database and users (if not exists already) table at programme start up
-with sqlite3.connect('quit.db') as db:
-    c = db.cursor()
-
-c.execute('CREATE TABLE IF NOT EXISTS user (username TEXT NOT NULL ,password TEX NOT NULL);')
-db.commit()
-db.close()
+from tkinter import Button, Label
+from tkinter.ttk import Entry
 
 
-# main Class
-class main:
+class car():  ####################################################  trunck manage
+
     def __init__(self, master):
-        # Window
+
+        ##super(car,self).__init__()
+        ##        tk.Frame.__init__(self, master)
+
         self.master = master
-        # Some Usefull variables
-        self.username = StringVar()
-        self.password = StringVar()
-        self.n_username = StringVar()
-        self.n_password = StringVar()
-        # Create Widgets
-        self.widgets()
+        ##self.master.geometry('500x600+100+200')
+        self.master.geometry('600x500')
+        self.master.title('Report')
+        self.button28 = Button(self.master, text="create", command=self.tabluh1)
+        self.button28.grid(row=0, column=0)
 
-    # Login Function
-    def login(self):
-        # Establish Connection
-        with sqlite3.connect('quit.db') as db:
-            c = db.cursor()
+        self.button29 = Button(self.master, text="insert rec", command=self.insertar1)
+        self.button29.grid(row=3, column=2)
 
-        # Find user If there is any take proper action
-        find_user = ('SELECT * FROM user WHERE username = ? and password = ?')
-        c.execute(find_user, [(self.username.get()), (self.password.get())])
-        result = c.fetchall()
-        if result:
-            self.logf.pack_forget()
-            self.head['text'] = self.username.get() + '\n Loged In'
-            self.head['pady'] = 150
-        else:
-            ms.showerror('Oops!', 'Username Not Found.')
+        self.tyLabel1 = Label(self.master, text="driver name")
+        self.tyLabel1.grid(row=1, column=0)
 
-    def new_user(self):
-        # Establish Connection
-        with sqlite3.connect('quit.db') as db:
-            c = db.cursor()
+        self.disLabel1 = Label(self.master, text="trunck type")
+        self.disLabel1.grid(row=2, column=0)
 
-        # Find Existing username if any take proper action
-        find_user = ('SELECT * FROM user WHERE username = ?')
-        c.execute(find_user, [(self.username.get())])
-        if c.fetchall():
-            ms.showerror('Error!', 'Username Taken Try a Diffrent One.')
-        else:
-            ms.showinfo('Success!', 'Account Created!')
-            self.log()
-        # Create New Account
-        insert = 'INSERT INTO user(username,password) VALUES(?,?)'
-        c.execute(insert, [(self.n_username.get()), (self.n_password.get())])
-        db.commit()
+        self.pelLabel1 = Label(self.master, text="pelack")
+        self.pelLabel1.grid(row=3, column=0)
 
-        # Frame Packing Methords
+        self.d = Entry(self.master)
+        self.d.grid(row=1, column=1)
 
-    def log(self):
-        self.username.set('')
-        self.password.set('')
-        self.crf.pack_forget()
-        self.head['text'] = 'LOGIN'
-        self.logf.pack()
+        self.e = Entry(self.master)
+        self.e.grid(row=2, column=1)
 
-    def cr(self):
-        self.n_username.set('')
-        self.n_password.set('')
-        self.logf.pack_forget()
-        self.head['text'] = 'Create Account'
-        self.crf.pack()
+        self.f = Entry(self.master)
+        self.f.grid(row=3, column=1)
 
-    # Draw Widgets
-    def widgets(self):
-        self.head = Label(self.master, text='LOGIN', font=('', 35), pady=10)
-        self.head.pack()
-        self.logf = Frame(self.master, padx=10, pady=10)
-        Label(self.logf, text='Username: ', font=('', 20), pady=5, padx=5).grid(sticky=W)
-        Entry(self.logf, textvariable=self.username, bd=5, font=('', 15)).grid(row=0, column=1)
-        Label(self.logf, text='Password: ', font=('', 20), pady=5, padx=5).grid(sticky=W)
-        Entry(self.logf, textvariable=self.password, bd=5, font=('', 15), show='*').grid(row=1, column=1)
-        Button(self.logf, text=' Login ', bd=3, font=('', 15), padx=5, pady=5, command=self.login).grid()
-        Button(self.logf, text=' Create Account ', bd=3, font=('', 15), padx=5, pady=5, command=self.cr).grid(row=2,
-                                                                                                              column=1)
-        self.logf.pack()
+        self.connection = sqlite3.connect('jadval.db')
+        self.cur = self.connection.cursor()
+        self.dateLabel1 = Label(self.master, text="driver name", width=10)
+        self.dateLabel1.grid(row=4, column=0)
+        self.BMILabel1 = Label(self.master, text="trunck type", width=10)
+        self.BMILabel1.grid(row=4, column=1)
+        self.stateLabel1 = Label(self.master, text="pelack", width=10)
+        self.stateLabel1.grid(row=4, column=2)
 
-        self.crf = Frame(self.master, padx=10, pady=10)
-        Label(self.crf, text='Username: ', font=('', 20), pady=5, padx=5).grid(sticky=W)
-        Entry(self.crf, textvariable=self.n_username, bd=5, font=('', 15)).grid(row=0, column=1)
-        Label(self.crf, text='Password: ', font=('', 20), pady=5, padx=5).grid(sticky=W)
-        Entry(self.crf, textvariable=self.n_password, bd=5, font=('', 15), show='*').grid(row=1, column=1)
-        Button(self.crf, text='Create Account', bd=3, font=('', 15), padx=5, pady=5, command=self.new_user).grid()
-        Button(self.crf, text='Go to Login', bd=3, font=('', 15), padx=5, pady=5, command=self.log).grid(row=2,
-                                                                                                         column=1)
+        self.button1 = Button(self.master, text='OK', command=self.get_list)
+        self.button1.grid(row=6, column=3)
 
+        ##        self.enter1 = Entry(self.master, bg='yellow')
+        ##        self.enter1.grid(row=8, column=3)
 
-# create window and application object
-root = Tk()
-# root.title("Login Form")
-main(root)
-root.mainloop()
+        self.readfromdatabase1()
+        ##self.showallrecords1()
+
+    ##    def showallrecords1(self):
+    ##
+    ##        data1 = self.readfromdatabase1()
+    ##        for index1, dat1 in enumerate(data1):
+    ##            Label(self.master, text=dat1[0]).grid(row=index1+5, column=0)
+    ##            Label(self.master, text=dat1[1]).grid(row=index1+5, column=1)
+    ##            Label(self.master, text=dat1[2]).grid(row=index1+5, column=2)
+
+    def tabluh1(self):
+        ##pragma encoding=utf8;
+        c.execute('''CREATE TABLE trunmanage(id1 INTEGER,firs1 stringvar(10),las1 stringvar(10))''')
+        ##c.execute('''CREATE TABLE trunmanage(id1 INTEGER,firs1 stringvar(10),las1 stringvar(10))''')
+
+    def insertar1(self):
+
+        d1 = self.d.get()
+        e1 = self.e.get()
+        f1 = int(self.f.get())
+        c.execute("INSERT INTO trunmanage (id1, firs1,las1 ) VALUES (?, ?, ?)", (f1, d1, e1))
+        conn.commit()
+        self.readfromdatabase1()
+        ##self.showallrecords1()
+
+    def readfromdatabase1(self):
+        self.cur.execute("SELECT * FROM trunmanage")
+        ##return self.cur.fetchall()
+        rows = self.cur.fetchall()
+        for row in rows:
+            ##lb1 = Listbox(self.master)
+            self.lb1 = Listbox(self.master)
+
+            ##lb1.grid(row=5)
+            self.lb1.grid(row=5)
+
+        for item in rows:
+            ##lb1.insert(END, item)
+            self.lb1.insert(END, item)
+
+    def get_list(self):
+        """
+        function to read the listbox selection
+        and put the result in an entry widget
+        """
+        global enter1
+
+        # get selected line index
+
+        ##index = lb1.curselection()[0]
+        index = self.lb1.curselection()[0]
+
+        # get the line's text
+
+        ##seltext = lb1.get(index)
+        seltext = self.lb1.get(index)
+
+        self.master.destroy()
+
+        # delete previous text in enter1
+        enter1.delete(0, 50)
+        ##        # now display the selected text
+        enter1.insert(0, seltext)

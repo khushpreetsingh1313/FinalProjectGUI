@@ -1,70 +1,106 @@
 import time
 from tkinter import *
 import sqlite3 as GUIdb
-
-import tkinter as mytkint
 import csv as file
+from sqlalchemy import  *
 
-class GUI:
+listBoxList = []
 
-    #DB = 'FinalProject.db'
+class GUI():
+
+
     DB = 'fi.db'
 
-
     def __init__(self):
-        self.species_var = StringVar()
-        self.year_var = StringVar()
-        self.day_var = StringVar()
-        self.number_var = StringVar()
-        self.buds_var = StringVar()
-        self.numFlower_var = StringVar()
-        self.matiurity_var = StringVar()
-        self.initials_var = StringVar()
-        self.comment_var = StringVar()
         self.widgets()
         self.saveData()
         self.insertData()
+        self.orminsert()
         self.Intials
-
-
 
 
 
 def insertData(self):
     """this insertData function read csv and creating connection as well as inserting row in database. It is also retrieving
-    records of database with select query"""
-
+    records of database """
+    csvList = []
     try:
         path = 'Quttinirpaaq_NP_Tundra_Plant_Phenology_2016-2017_data_1.csv'
         # opening csv file and putting file in object
         with open(path, encoding="ISO-8859-1") as csvfile:
             read = file.reader(csvfile)
-            csvList = []
+
             for data in read:
                 csvList.append(data)
-         # database name
-        #DB = globals()
-        con = GUIdb.connect('FinalProject.db') # connection with database
+
+        con = GUIdb.connect("FinalProject.db")  # connection with database
         print("Author is Khushpreet Singh")
         with con:
             cur = con.cursor()
-            # creating table if not exists
-            cur.execute("create table IF not exists Flower(Species TEXT, year DATE, Julian_Day_of_Year INTEGER,  Plant_Identification_Number INTEGER,  Number_of_Buds INTEGER,  Number_of_Flowers INTEGER,  Number_of_Flowers_that_have_Reached_Maturity INTEGER,  Observer_Initials TEXT,  Observer_Comments TEXT)")
-
-            """Inserting records into Db from arraylist"""
+            cur.execute("DROP TABLE IF EXISTS flowers")
+            cur.execute("create table IF not exists flowers(Species TEXT, year DATE, Julian_Day_of_Year INTEGER,  Plant_Identification_Number INTEGER,  Number_of_Buds INTEGER,  Number_of_Flowers INTEGER,  Number_of_Flowers_that_have_Reached_Maturity INTEGER,  Observer_Initials TEXT,  Observer_Comments TEXT)")
+            insert = "INSERT INTO flowers  VALUES ( ?,?,?,?,?,?,?,?,?)"
             for i in range(len(csvList)):
-                cur.execute("INSERT INTO Flower  VALUES ( ?,?,?,?,?,?,?,?,?)",(csvList[i]))
-            print("Loading data........")
-            #select all from table flower to display records with cursor
-            cur.execute("SELECT * FROM Flower;")
+                cur.execute(insert, (csvList[i]))
+
+            print("inserted sucessfully")
+            print("Developed by Khushpreet Singh")
+
+            cur.execute("SELECT * FROM flowers;")
             data = cur.fetchall()
+            Lb1.delete(0, END)
+            listBoxList.clear()
             for d in data:
-                print(d)
-            print("data loaded sucessfully in database")
+                listBoxList.append(d)
+            headers = ["species", "Year", "Julian Day of Year", "Plant Identification Number", "Number of Buds",
+                       "Number of Flowers", "Number of Flowers that have Reached Maturity", "Observer Initials",
+                       "Observer Comments"]
+            row_format = "{:<15s}{:<15s}{:<30s}{:<40s}{:<30s}{:<30s}{:<50s}{:<30s}{:<30s}"
+            Lb1.insert(0, row_format.format(*headers, sp=" " * 2))
+
+            for row in listBoxList:
+                print(row)
+                Lb1.insert(END, row_format.format(*row, sp=" " * 2))
+                # print(listBoxList)
     except:
         print("error")
-    return self
+    return "CSVINSERT"
 
+def saveData(event):
+    global listBoxList
+    # database name
+    con = GUIdb.connect("FinalProject.db")  # connection with database
+    print("Author is Khushpreet Singh")
+    with con:
+        cur = con.cursor()
+        #cur.execute("DROP TABLE IF EXISTS flowers")
+        cur.execute("create table IF not exists flowers(id INTEGER PRIMARY KEY,Species TEXT, year DATE, Julian_Day_of_Year INTEGER,  Plant_Identification_Number INTEGER,  Number_of_Buds INTEGER,  Number_of_Flowers INTEGER,  Number_of_Flowers_that_have_Reached_Maturity INTEGER,  Observer_Initials TEXT,  Observer_Comments TEXT)")
+        insert = "INSERT INTO flowers  VALUES ( ?,?,?,?,?,?,?,?,?)"
+        cur.execute(insert, [(species_text.get()), (year_text.get()), (Day_text.get()),
+                             (Identification_text.get()), (Buds_text.get()), (flowers_text.get()),
+                             (Maturity_text.get()), (Initials_text.get()), (Comments_text.get())])
+        cur.execute("SELECT * FROM flowers;")
+        data = cur.fetchall()
+        Lb1.delete(0,END)
+        listBoxList.clear()
+        for d in data:
+            listBoxList.append(d)
+
+        headers = ["ID", "species", "Year", "Julian Day of Year", "Plant Identification Number", "Number of Buds",
+                   "Number of Flowers", "Number of Flowers that have Reached Maturity", "Observer Initials",
+                   "Observer Comments"]
+        row_format = "{:<15s}{:<15s}{:<15s}{:<30s}{:<40s}{:<30s}{:<30s}{:<50s}{:<30s}{:<30s}"
+        Lb1.insert(0, row_format.format(*headers, sp=" " * 2))
+
+        for row in listBoxList:
+            print(row)
+            Lb1.insert(END, row_format.format(*row, sp=" " * 2))
+
+    print("Database created")
+    return "db"
+
+
+len_max = 12
 
 root = Tk()
 species = Label(root,text="species")
@@ -118,31 +154,26 @@ submit = Button(root,text="Submit",anchor=CENTER)
 submit.grid(row = 11,column=0)
 
 
-def saveData(event):
-
-    # database name
-    con = GUIdb.connect("FinalProject.db")  # connection with database
-    print("Author is Khushpreet Singh")
-    with con:
-        cur = con.cursor()
-        # cur.execute("DROP TABLE IF EXISTS Flower")
-        cur.execute("create table IF not exists Flower(Species TEXT, year DATE, Julian_Day_of_Year INTEGER,  Plant_Identification_Number INTEGER,  Number_of_Buds INTEGER,  Number_of_Flowers INTEGER,  Number_of_Flowers_that_have_Reached_Maturity INTEGER,  Observer_Initials TEXT,  Observer_Comments TEXT)")
-        insert = "INSERT INTO Flower  VALUES ( ?,?,?,?,?,?,?,?,?)"
-        cur.execute(insert, [(species_text.get()), (year_text.get()), (Day_text.get()),
-                             (Identification_text.get()), (Buds_text.get()), (flowers_text.get()),
-                             (Maturity_text.get()), (Initials_text.get()), (Comments_text.get())])
-        cur.execute("SELECT * FROM Flower;")
-        data = cur.fetchall()
-        for d in data:
-            print(d)
-    print("Database created")
 
 submit.bind('<Button-1>', saveData)
 
-csvButton = Button(root, text="open csv", anchor=CENTER)
-csvButton.grid(row=11, column=1)
+csvButton = Button(root, text="insert from csv", anchor=CENTER)
+csvButton.grid(row=11, column=1,sticky=W)
 csvButton.bind("<Button-1>", insertData)
 
+
+name = Label(root, text="Khushpreet Singh")
+name.grid(row=12, column=0,sticky=W)
+
+
+Lb1 = Listbox(width = 80)
+
+Lb1.grid(row=0,column=2, rowspan=12,
+    padx=5, sticky=E+W+S+N)
+
+headers = ["ID","species","Year","Julian Day of Year", "Plant Identification Number", "Number of Buds","Number of Flowers","Number of Flowers that have Reached Maturity","Observer Initials","Observer Comments"]
+row_format ="{:<15s}{:<15s}{:<15s}{:<30s}{:<40s}{:<30s}{:<30s}{:<50s}{:<30s}{:<30s}"
+Lb1.insert(0, row_format.format(*headers, sp=" "*2))
 
 root.mainloop()
 
@@ -152,3 +183,4 @@ time.sleep(2)
 obj = GUI()
 obj.saveData()
 obj.insertData()
+obj.orminsert()
