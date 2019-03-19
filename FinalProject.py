@@ -18,6 +18,8 @@ class GUI():
         self.deleterow()
 
 
+
+
 def loadcsv(self):
     """this insertData function read csv and creating connection as well as inserting row in database. It is also retrieving
     records of database """
@@ -47,7 +49,10 @@ def loadcsv(self):
             print("inserted sucessfully")
             print("Developed by Khushpreet Singh")
 
+
+
             cur.execute("SELECT * FROM flowers;")
+
             data = cur.fetchall()
             Lb1.delete(0, END)
             listBoxList.clear()
