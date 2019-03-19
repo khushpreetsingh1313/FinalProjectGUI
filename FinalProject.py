@@ -7,7 +7,7 @@ import sqlite3 as GUIdb
 import csv as file
 
 listBoxList = []
-
+id_db=id
 class GUI():
 
     def __init__(self):
@@ -16,8 +16,6 @@ class GUI():
         self.searchData()
         self.updaterow()
         self.deleterow()
-
-
 
 
 def loadcsv(self):
@@ -49,12 +47,11 @@ def loadcsv(self):
             print("inserted sucessfully")
             print("Developed by Khushpreet Singh")
 
-
-
             cur.execute("SELECT * FROM flowers;")
 
             data = cur.fetchall()
             Lb1.delete(0, END)
+            msgbox.delete(0,END)
             listBoxList.clear()
             for d in data:
                 listBoxList.append(d)
@@ -67,12 +64,13 @@ def loadcsv(self):
             for row in listBoxList:
                 print(row)
                 Lb1.insert(END, str(row[0]).ljust(15)+str(row[1]).ljust(25) +str(row[2]).ljust(20) +str(row[3]).ljust(50) +str(row[4]).ljust(50) +str(row[5]).ljust(40) +str(row[6]).ljust(50)+str(row[7]).ljust(70) +str(row[8]).ljust(40) +str(row[9]))
+            msgbox.insert(END,"Data from csv file loaded in database sucessfully.Now you can perform operations on data")
     except:
         print("error loadig file. may be file missing")
     return "CSV loaded sucessfully"
 
 
-def insert(event):
+def insert(self):
 
     con = GUIdb.connect("FinalProject.db")  # connection with database
     print("Author is Khushpreet Singh")
@@ -103,11 +101,13 @@ def insert(event):
             Lb1.insert(END, str(row[0]).ljust(15) + str(row[1]).ljust(25) + str(row[2]).ljust(20) + str(row[3]).ljust(
                 50) + str(row[4]).ljust(50) + str(row[5]).ljust(40) + str(row[6]).ljust(50) + str(row[7]).ljust(
                 70) + str(row[8]).ljust(40) + str(row[9]))
+        msgbox.insert(END,"Data Row inserted in database table..........")
         print("list updated")
     return "data saved"
 
 
 def searchData(self):
+    msgbox.insert(END,"Searching........")
 
     species_text.delete(0,END)
     year_text.delete(0,END)
@@ -138,6 +138,8 @@ def searchData(self):
             Initials_text.insert(8,str(d[8]))
             Comments_text.insert(9,str(d[9]))
         print(row)
+
+        msgbox.insert(END,"Search completed & data is populated in entry fields for updation and deletion")
 
     return "search"
 
@@ -181,6 +183,7 @@ def updaterow(self):
                 50) + str(row[4]).ljust(50) + str(row[5]).ljust(40) + str(row[6]).ljust(50) + str(row[7]).ljust(
                 70) + str(row[8]).ljust(40) + str(row[9]))
         print("data updtaed")
+        msgbox.insert(END,"Row updated & listbox is also updated.....")
 
     return "Row updated"
 
@@ -211,8 +214,18 @@ def deleterow(self):
         Lb1.insert(END, str(row[0]).ljust(15) + str(row[1]).ljust(25) + str(row[2]).ljust(20) + str(row[3]).ljust(
             50) + str(row[4]).ljust(50) + str(row[5]).ljust(40) + str(row[6]).ljust(50) + str(row[7]).ljust(
             70) + str(row[8]).ljust(40) + str(row[9]))
+    msgbox.insert(END,"Data Row with id "+id+" is deleted from database and listbox...")
+    msgbox.insert(END,"Listbox updated....")
 
-    print("list updated")
+    species_text.delete(0, END)
+    year_text.delete(0, END)
+    Day_text.delete(0, END)
+    Identification_text.delete(0, END)
+    Buds_text.delete(0, END)
+    flowers_text.delete(0, END)
+    Maturity_text.delete(0, END)
+    Initials_text.delete(0, END)
+    Comments_text.delete(0, END)
     return "Row deleted"
 
 
@@ -220,9 +233,9 @@ len_max = 12
 
 root = Tk()
 
-id = Label(root,text="ID")
+id = Label(root,text="fill the fields to insert data & click on submit")
 id.grid(row=0,column =0,sticky=W)
-id_text = Label(root)
+id_text = Label(root,text="")
 id_text.grid(row=0,column=1)
 
 species = Label(root,text="species")
@@ -272,35 +285,41 @@ Comments_text = Entry(root)
 Comments_text.grid(row=9, column=1)
 
 submit = Button(root,text="Submit",anchor=CENTER)
-submit.grid(row = 11,column=0)
+submit.grid(row=11, column=1,sticky=EW)
 submit.bind('<Button-1>', insert)
 
 csvButton = Button(root, text="insert from csv", anchor=CENTER)
-csvButton.grid(row=11, column=1,rowspan=2,sticky=W)
+csvButton.grid(row=12, column=1,sticky=EW)
 csvButton.bind("<Button-1>", loadcsv)
 
-Search = Button(root, text="serachID", anchor=N)
-Search.grid(row=14, column=1,sticky=W)
+Search = Button(root, text="serachID")
+Search.grid(row=14, column=1,sticky=N)
 Search.bind("<Button-1>", searchData)
 
 Search_text = Entry(root)
-Search_text.grid(row=14, column=0)
+Search_text.grid(row=13, column=1,sticky=S)
 
-update = Button(root, text="update", anchor=N)
-update.grid(row=15, column=1,sticky=W)
+update = Button(root, text="update", anchor=N,bg="black",fg="#006366")
+update["bg"] = "green"
+
+update.grid(row=15, column=1,sticky=NW)
 update.bind("<Button-1>", updaterow)
 
 delete = Button(root, text="Delete", anchor=N)
-delete.grid(row=16, column=1,sticky=W)
+delete.grid(row=15, column=1,sticky=NE)
 delete.bind("<Button-1>", deleterow)
-
 Lb1 = Listbox(width = 100)
 
 Lb1.grid(row=0,column=2, rowspan=12,
     padx=5, sticky=E+W+S+N)
+Lb1.insert(END,"Please click on 'insert from csv' button")
 
-yscrollbar = Scrollbar(root)
-yscrollbar.grid(rowspan=16, column=3, sticky=N+S)
+msgbox = Listbox(width = 50)
+msgbox.grid(row=13,column=2, rowspan=2, sticky=E+W+S+N)
+
+namebox = Listbox(width = 50)
+namebox.grid(row=13,column=0, rowspan=2, sticky=E+W+S+N)
+
 root.mainloop()
 
 root = Tk()
