@@ -1,139 +1,305 @@
 # Author: Khushpreet Singh
 # version: 1.0
 # Date Created: 13 Jan 2019
-# Date Modified: 13 Jan 2019
+# Date Modified: 19 March 2019
+from tkinter import *
+import sqlite3 as GUIdb
 import csv as file
 
-def main():
-    """this method is running all other method with the class object"""
-    obj = Finalproject()
-    obj.name()
-    obj.read()
+listBoxList = []
+
+class GUI():
+
+    def __init__(self):
+        self.loadcsv()
+        self.insert()
+        self.searchData()
+        self.updaterow()
+        self.deleterow()
 
 
-class Finalproject:
-    """
-    This class named project is developed by khushpreet singh to perform I/O on csv file and putting data in list and performing
-    Create,Read,update and Delete operations on list
-    """
-    def name(self):
-        print("Program written by Khushpreet singh")
-        return "Author"
+def loadcsv(self):
+    """this insertData function read csv and creating connection as well as inserting row in database. It is also retrieving
+    records of database """
+    try:
+        path = 'Quttinirpaaq_NP_Tundra_Plant_Phenology_2016-2017_data_1.csv'
+        # opening csv file and putting file in object
+        with open(path, encoding="ISO-8859-1") as csvfile:
+            read = file.reader(csvfile)
+            csvList = []
+            j = 0
+            for data in read:
+                if (j > 3):
+                    csvList.append(data)
+                j += 1
 
-    def read(self):
-        """this read function read csv and perform CRUD operations"""
-        try:
-            path = 'Quttinirpaaq_NP_Tundra_Plant_Phenology_2016-2017_data_1.csv'
-            #opening csv file and putting file in object
-            with open(path, encoding = "ISO-8859-1") as csvfile:
-                csv_read = file.reader(csvfile)
-                crud_list = [] #arraylist / data structure
-                choice = 'y'
+        con = GUIdb.connect("FinalProject.db")  # connection with database
+        print("Author is Khushpreet Singh")
 
-                """loop through csv object to get data without
-                column names
-                """
-                j = 0
-                for index_data in csv_read:
-                    if (j > 1 and j <= 11):
-                        crud_list.append(index_data)
-                    j += 1
+        with con:
+            cur = con.cursor()
+            cur.execute("DROP TABLE IF EXISTS flowers")
+            cur.execute("create table IF not exists flowers(id INTEGER PRIMARY KEY AUTOINCREMENT ,Species VARCHAR(70) , c_year INTEGER, Julian_Day_of_Year INTEGER,  Plant_Identification_Number INTEGER,  Number_of_Buds INTEGER,  Number_of_Flowers INTEGER,  Number_of_Flowers_that_have_Reached_Maturity INTEGER,  Observer_Initials VARCHAR(20),  Observer_Comments VARCHAR(20))")
+            for i in range(len(csvList)):
+                print(i)
+                cur.execute('INSERT INTO flowers (Species,c_year,Julian_Day_of_Year,Plant_Identification_Number,Number_of_Buds,Number_of_Flowers,Number_of_Flowers_that_have_Reached_Maturity,Observer_Initials,Observer_Comments) VALUES (?,?,?,?,?,?,?,?,?)',(csvList[i]))
 
-                cols = ['Species','Year','Julian Day of Year', 'Plant Identification Number','Number of Buds',
-                       'Number of Flowers',
-                       'Number of Flowers that have Reached Maturity',
-                       'Observer Initials',
-                       'Observer Comments']
+            print("inserted sucessfully")
+            print("Developed by Khushpreet Singh")
 
-                # while choice is y/Y program will keep running
-                while (choice =='y' or choice =='Y'):
-                    print("Enter between 1 to 4")
-                    print("Enter 1 for Read")
-                    print("Enter 2 for add")
-                    print("Enter 3 for update")
-                    print("Enter 4 for Delete")
+            cur.execute("SELECT * FROM flowers;")
+            data = cur.fetchall()
+            Lb1.delete(0, END)
+            listBoxList.clear()
+            for d in data:
+                listBoxList.append(d)
+            headers = ["ID","species", "Year", "Julian Day of Year", "Plant Identification Number", "Number of Buds",
+                       "Number of Flowers", "Number of Flowers that have Reached Maturity", "Observer Initials",
+                       "Observer Comments"]
+            row_format = "{:<15s}{:<30s}{:<20s}{:<30s}{:<40s}{:<30s}{:<30s}{:<50s}{:<30s}{:<30s}"
+            Lb1.insert(0, row_format.format(*headers, sp=" "))
 
-                    #user input to runa particular operation on data
-                    case = input("Enter case ")
-
-                    if(case == "1"):
-                        print("Program written by Khushpreet singh")
-                        print(cols)  # print column names from cols array
-                        # For Loop for print data of list
-                        for data in crud_list:
-                            print(data)
-                        print("you are running case #"+case)
+            for row in listBoxList:
+                print(row)
+                Lb1.insert(END, str(row[0]).ljust(15)+str(row[1]).ljust(25) +str(row[2]).ljust(20) +str(row[3]).ljust(50) +str(row[4]).ljust(50) +str(row[5]).ljust(40) +str(row[6]).ljust(50)+str(row[7]).ljust(70) +str(row[8]).ljust(40) +str(row[9]))
+    except:
+        print("error loadig file. may be file missing")
+    return "CSV loaded sucessfully"
 
 
+def insert(event):
 
-                    if (case == '2'):
-                        print("Program written by Khushpreet singh")
-                        #user inputs to insert record in arraylist
-                        name_flower = input("enter species ")
-                        year = input("enter year ")
-                        Julian_Day_of_Year = input("Julian Day of Year ")
-                        Plant_Identification_Number = input("Plant Identification Number ")
-                        Number_of_buds = input("Number of Buds ")
-                        Number_of_Flowers = input("Number of Flowers ")
-                        Maturity = input("Number of Flowers that have Reached Maturity ")
-                        Observer_Initials = input("observer Initials ")
-                        Observer_Comments = input("observer comments ")
-                        crud_list.append([name_flower, year, Julian_Day_of_Year,Plant_Identification_Number,Number_of_buds,Number_of_Flowers,Maturity,Observer_Initials,Observer_Comments])
-                        print(cols)
-                        for data in crud_list:
-                            print(data)
-                        print("list is updated successfully")
-                        print("you are running case #"+case)
-                    # Case 3 for update data in list and print
-                    if (case == '3'):
-                        print("Program written by Khushpreet singh")
-                        print(cols) # print column names from cols array
-                        # for loop to print data of list before updation
-                        for data in crud_list:
-                            print(data)
-                        #user input index which user want to update
-                        j = input("enter index (index start from 0) ")
+    con = GUIdb.connect("FinalProject.db")  # connection with database
+    print("Author is Khushpreet Singh")
+    with con:
+        cur = con.cursor()
+        #cur.execute("DROP TABLE IF EXISTS flowers")
+        cur.execute("create table IF not exists flowers(id INTEGER PRIMARY KEY AUTOINCREMENT ,Species VARCHAR(70) , c_year INTEGER, Julian_Day_of_Year INTEGER,  Plant_Identification_Number INTEGER,  Number_of_Buds INTEGER,  Number_of_Flowers INTEGER,  Number_of_Flowers_that_have_Reached_Maturity INTEGER,  Observer_Initials VARCHAR(20),  Observer_Comments VARCHAR(20))")
+        cur.execute(
+            'INSERT INTO flowers (Species,c_year,Julian_Day_of_Year,Plant_Identification_Number,Number_of_Buds,Number_of_Flowers,Number_of_Flowers_that_have_Reached_Maturity,Observer_Initials,Observer_Comments) VALUES (?,?,?,?,?,?,?,?,?)',
+            [(species_text.get()), (year_text.get()), (Day_text.get()),
+                             (Identification_text.get()), (Buds_text.get()), (flowers_text.get()),
+                             (Maturity_text.get()), (Initials_text.get()), (Comments_text.get())])
+        cur.execute("SELECT * FROM flowers;")
+        data = cur.fetchall()
+        Lb1.delete(0,END)
+        listBoxList.clear()
+        for d in data:
+            listBoxList.append(d)
 
-                        # converting string to Integer
-                        index_id = int(j)
-                        # user inputs for update record
-                        name_flower = input("enter species ")
-                        year = input("enter year ")
-                        Julian_Day_of_Year = input("Julian Day of Year ")
-                        Plant_Identification_Number = input("Plant Identification Number ")
-                        Number_of_buds = input("Number of Buds ")
-                        Number_of_Flowers = input("Number of Flowers ")
-                        Maturity = input("Number of Flowers that have Reached Maturity ")
-                        Observer_Initials = input("observer Initials ")
-                        Observer_Comments = input("observer comments ")
-                        #updating index with new entries
-                        crud_list[index_id]=[name_flower, year, Julian_Day_of_Year, Plant_Identification_Number, Number_of_buds,
-                             Number_of_Flowers, Maturity, Observer_Initials, Observer_Comments]
-                        for data in crud_list:
-                            print(data)
-                        print("list is updated successfully")
-                        print("you are running case #" + case)
-                    # Case 4 for print data in list
-                    if (case == '4'):
-                        print("Program written by Khushpreet singh")
-                        print(cols)  # print column names from cols array
-                        for data in crud_list:
-                            print(data)
-                        print("you are running case #" + case)
-                        # user input for deleting index
-                        i = input("enter index to delete number(index start from 0) ")
-                        # converting string to integer
-                        index_data = int(i)
-                        # Deleting entered index
-                        del crud_list[index_data]
-                        for data in crud_list:
-                            print(data)
+        headers = ["ID", "species", "Year", "Julian Day of Year", "Plant Identification Number", "Number of Buds",
+                   "Number of Flowers", "Number of Flowers that have Reached Maturity", "Observer Initials",
+                   "Observer Comments"]
+        row_format = "{:<15s}{:<30s}{:<20s}{:<30s}{:<40s}{:<30s}{:<30s}{:<50s}{:<30s}{:<30s}"
+        Lb1.insert(0, row_format.format(*headers, sp=" "))
 
-                    choice = input("Do you want to continue....(Enter y/Y to continue) ")
+        for row in listBoxList:
+            print(row)
+            Lb1.insert(END, str(row[0]).ljust(15) + str(row[1]).ljust(25) + str(row[2]).ljust(20) + str(row[3]).ljust(
+                50) + str(row[4]).ljust(50) + str(row[5]).ljust(40) + str(row[6]).ljust(50) + str(row[7]).ljust(
+                70) + str(row[8]).ljust(40) + str(row[9]))
+        print("list updated")
+    return "data saved"
 
-        except FileNotFoundError:
-            print('file not found')
-        return "done"
 
-if __name__ == '__main__':
-    main()
+def searchData(self):
+
+    species_text.delete(0,END)
+    year_text.delete(0,END)
+    Day_text.delete(0,END)
+    Identification_text.delete(0,END)
+    Buds_text.delete(0,END)
+    flowers_text.delete(0,END)
+    Maturity_text.delete(0,END)
+    Initials_text.delete(0,END)
+    Comments_text.delete(0,END)
+
+    con = GUIdb.connect("FinalProject.db")  # connection with database
+    print("Author is Khushpreet Singh")
+    with con:
+        cur = con.cursor()
+        id = Search_text.get()
+        cur.execute('select * from flowers where id ='+id)
+        row = cur.fetchall()
+        for d in row:
+            id_text.setvar(id)
+            species_text.insert(1,str(d[1]))
+            year_text.insert(2,str(d[2]))
+            Day_text.insert(3,str(d[3]))
+            Identification_text.insert(4,str(d[4]))
+            Buds_text.insert(5,str(d[5]))
+            flowers_text.insert(6,str(d[6]))
+            Maturity_text.insert(7,str(d[7]))
+            Initials_text.insert(8,str(d[8]))
+            Comments_text.insert(9,str(d[9]))
+        print(row)
+
+    return "search"
+
+
+def updaterow(self):
+
+    con = GUIdb.connect("FinalProject.db")  # connection with database
+    print("Author is Khushpreet Singh")
+    with con:
+        cur = con.cursor()
+        sp = species_text.get()
+        print(sp)
+        year = year_text.get()
+        print(year)
+        day = Day_text.get()
+        pid = Identification_text.get()
+        buds = Buds_text.get()
+        fnum = Buds_text.get()
+        mat = Maturity_text.get()
+        initials = Initials_text.get()
+        comm = Comments_text.get()
+        id = Search_text.get()
+        cur.execute("""UPDATE flowers SET Species=?,c_year=?,Julian_Day_of_Year=?,Plant_Identification_Number=?,Number_of_Buds=?, Number_of_Flowers=?,Number_of_Flowers_that_have_Reached_Maturity=?,Observer_Initials=?,Observer_Comments=? WHERE id=?""",(sp,year,day,pid,buds,fnum,mat,initials,comm,id))
+        row = cur.fetchall()
+        cur.execute("SELECT * FROM flowers;")
+        data = cur.fetchall()
+        Lb1.delete(0, END)
+        listBoxList.clear()
+        for d in data:
+            listBoxList.append(d)
+
+        headers = ["ID", "species", "Year", "Julian Day of Year", "Plant Identification Number", "Number of Buds",
+                   "Number of Flowers", "Number of Flowers that have Reached Maturity", "Observer Initials",
+                   "Observer Comments"]
+        row_format = "{:<15s}{:<30s}{:<20s}{:<30s}{:<40s}{:<30s}{:<30s}{:<50s}{:<30s}{:<30s}"
+        Lb1.insert(0, row_format.format(*headers, sp=" "))
+
+        for row in listBoxList:
+            print(row)
+            Lb1.insert(END, str(row[0]).ljust(15) + str(row[1]).ljust(25) + str(row[2]).ljust(20) + str(row[3]).ljust(
+                50) + str(row[4]).ljust(50) + str(row[5]).ljust(40) + str(row[6]).ljust(50) + str(row[7]).ljust(
+                70) + str(row[8]).ljust(40) + str(row[9]))
+        print("data updtaed")
+
+    return "Row updated"
+
+def deleterow(self):
+
+    con = GUIdb.connect("FinalProject.db")  # connection with database
+    print("Author is Khushpreet Singh")
+    with con:
+        cur = con.cursor()
+        id = Search_text.get()
+        print(id)
+        cur.execute('delete from flowers where id ='+id)
+        data = cur.execute('select * from main.flowers')
+        print(cur)
+    Lb1.delete(0, END)
+    listBoxList.clear()
+    for d in data:
+        listBoxList.append(d)
+
+    headers = ["ID", "species", "Year", "Julian Day of Year", "Plant Identification Number", "Number of Buds",
+               "Number of Flowers", "Number of Flowers that have Reached Maturity", "Observer Initials",
+               "Observer Comments"]
+    row_format = "{:<15s}{:<30s}{:<20s}{:<30s}{:<40s}{:<30s}{:<30s}{:<50s}{:<30s}{:<30s}"
+    Lb1.insert(0, row_format.format(*headers, sp=" "))
+
+    for row in listBoxList:
+        print(row)
+        Lb1.insert(END, str(row[0]).ljust(15) + str(row[1]).ljust(25) + str(row[2]).ljust(20) + str(row[3]).ljust(
+            50) + str(row[4]).ljust(50) + str(row[5]).ljust(40) + str(row[6]).ljust(50) + str(row[7]).ljust(
+            70) + str(row[8]).ljust(40) + str(row[9]))
+
+    print("list updated")
+    return "Row deleted"
+
+
+len_max = 12
+
+root = Tk()
+
+id = Label(root,text="ID")
+id.grid(row=0,column =0,sticky=W)
+id_text = Label(root)
+id_text.grid(row=0,column=1)
+
+species = Label(root,text="species")
+species.grid(row=1,column =0,sticky=W)
+species_text = Entry(root)
+species_text.grid(row=1,column=1)
+
+year = Label(root, text="Year")
+year.grid(row=2, column=0,sticky=W)
+year_text = Entry(root)
+year_text.grid(row=2, column=1)
+
+Day = Label(root, text="Julian Day of Year")
+Day.grid(row=3, column=0,sticky=W)
+Day_text = Entry(root)
+Day_text.grid(row=3, column=1)
+
+Identification = Label(root, text="Plant Identification Number")
+Identification.grid(row=4, column=0,sticky=W)
+Identification_text = Entry(root)
+Identification_text.grid(row=4, column=1)
+
+buds = Label(root, text="Number of Buds")
+buds.grid(row=5, column=0,sticky=W)
+Buds_text = Entry(root)
+Buds_text.grid(row=5, column=1)
+
+flower = Label(root, text="Number of Flowers")
+flower.grid(row=6, column=0,sticky=W)
+flowers_text = Entry(root)
+flowers_text.grid(row=6, column=1)
+
+Maturity = Label(root, text="Number of Flowers that have Reached Maturity")
+Maturity.grid(row=7, column=0,sticky=W)
+Maturity_text = Entry(root)
+Maturity_text.grid(row=7, column=1)
+
+
+Initials = Label(root, text="Observer Initials")
+Initials.grid(row=8, column=0,sticky=W)
+Initials_text = Entry(root)
+Initials_text.grid(row=8, column=1)
+
+Comments = Label(root, text="Observer Comments")
+Comments.grid(row=9, column=0,sticky=W)
+Comments_text = Entry(root)
+Comments_text.grid(row=9, column=1)
+
+submit = Button(root,text="Submit",anchor=CENTER)
+submit.grid(row = 11,column=0)
+submit.bind('<Button-1>', insert)
+
+csvButton = Button(root, text="insert from csv", anchor=CENTER)
+csvButton.grid(row=11, column=1,rowspan=2,sticky=W)
+csvButton.bind("<Button-1>", loadcsv)
+
+Search = Button(root, text="serachID", anchor=N)
+Search.grid(row=14, column=1,sticky=W)
+Search.bind("<Button-1>", searchData)
+
+Search_text = Entry(root)
+Search_text.grid(row=14, column=0)
+
+update = Button(root, text="update", anchor=N)
+update.grid(row=15, column=1,sticky=W)
+update.bind("<Button-1>", updaterow)
+
+delete = Button(root, text="Delete", anchor=N)
+delete.grid(row=16, column=1,sticky=W)
+delete.bind("<Button-1>", deleterow)
+
+Lb1 = Listbox(width = 100)
+
+Lb1.grid(row=0,column=2, rowspan=12,
+    padx=5, sticky=E+W+S+N)
+
+yscrollbar = Scrollbar(root)
+yscrollbar.grid(rowspan=16, column=3, sticky=N+S)
+root.mainloop()
+
+root = Tk()
+
+obj = GUI()
+obj.saveData()
+obj.insertData()

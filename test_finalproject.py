@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from FinalProject import Finalproject
+from FinalProject import deleteRow
 
 class TestFinalproject(TestCase):
 
@@ -12,5 +12,5 @@ class TestFinalproject(TestCase):
 
         """Test method for name() function in the FinalProject class """
 
-        test = Finalproject.name(self)
-        self.assertEqual(test,"Author")
+        test = deleteRow.name(self)
+        self.assertEqual(test,"Row")
